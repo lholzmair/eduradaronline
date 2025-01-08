@@ -3,11 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
 };
 
-module.exports = {
-  eslint: {
-      ignoreDuringBuilds: true,
-  },
-};
 
 export default nextConfig;
 
