@@ -1,21 +1,21 @@
-
 const express = require('express');
-const path = require('path');
+const next = require('next');
 const mysql = require('mysql');
 const cors = require('cors');
 
+const dev = process.env.NODE_ENV !== 'production'; // Entwicklungsmodus prüfen
+const nextApp = next({ dev }); // Next.js-App initialisieren
+const handle = nextApp.getRequestHandler(); // Next.js-Routing
+
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 4000;
 
 // Middleware
-app.use(express.static('public'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
-// MySQL Connection-Pool
-require('dotenv').config();
-
+// MySQL-Verbindung
 const connection = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -26,6 +26,7 @@ const connection = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0,
 });
+
 
 // Utility-Funktion für Promises
 const queryAsync = (sql, params = []) => {
@@ -267,6 +268,14 @@ app.get('/api/random-schools', (req, res) => {
 });
 
 // Server starten
-app.listen(port, () => {
-    console.log(`Server läuft auf http://localhost:${port}`);
-});
+// Next.js übernimmt alle anderen Routen
+nextApp.prepare().then(() => {
+    app.all('*', (req, res) => {
+        return handle(req, res);
+    });
+
+    app.listen(port, () => {
+        console.log(`Server läuft auf http://localhost:${port}`);
+    });
+
+})
