@@ -1,6 +1,6 @@
 const express = require('express');
 const next = require('next');
-const mysql = require('mysql');
+const mysql = require('mysql12');
 const cors = require('cors');
 
 const dev = process.env.NODE_ENV !== 'production'; // Entwicklungsmodus prüfen
